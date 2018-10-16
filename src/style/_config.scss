@@ -1,0 +1,28 @@
+@import "./colors";
+// $theme-accent--light: $blue-base;
+// $theme-accent--dark: $theme-accent--light;
+// $theme-secondary--light: $silver-base;
+// $theme-secondary--dark: darken($theme-secondary--light, 20);
+// $theme-page-background--light: lighten($silver-base, 10);
+// $theme-page-background--dark: lighten($grey-base, 10);
+// $theme-page-color--light: $grey-base;
+// $theme-page-color--dark: lighten($silver-base, 20);
+// $theme-component-background--light: lighten($silver-base, 5);
+// $theme-component-background--dark: $grey-base;
+// $theme-info: lighten($blue-base, 10);
+// $theme-success: $green-base;
+// $theme-warning: $yellow-base;
+// $theme-error: $red-base;
+
+$font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
+  Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+//  Logo
+//  ───────────────────────────────────
+$logo-color: $oc-blue-6;
+$logo-font-size: 50px;
+$logo-font-family: "IBM Plex Sans", $font-base;
+
+//  Footer
+//  ───────────────────────────────────
+$footer-color: $oc-gray-7;
