@@ -1,23 +1,15 @@
 <template>
   <div class="home">
     <div class="title">
-      Tags
-    </div> 
+      Success
+    </div>
     <div class="decoration"/>
-    <el-row :gutter="20">
-      <!-- <el-col 
-        v-for="item in tags" 
-        :key="item.id" 
-        :span="8">    
-        <el-card shadow="hover">
-          {{ item.name }}
-        </el-card>
-      </el-col> -->
-    </el-row>
+    <div class="sub-title">Hello {{ profile.username }}</div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "Home",
   data() {
@@ -27,12 +19,9 @@ export default {
     };
   },
   computed: {
-    // ...mapState({
-    //   tags: state => state.user.tags
-    // })
-  },
-  async mounted() {
-    // await this.$store.dispatch(FETCH_TAGS);
+    ...mapState({
+      profile: state => state.user.profile
+    })
   },
   methods: {
     onSubmit() {}
@@ -49,7 +38,7 @@ export default {
 
   .title {
     font-family: $logo-font-family;
-    font-size: $logo-font-size;
+    font-size: $logo-font-size * 2;
     color: $logo-color;
   }
   .decoration {
@@ -57,6 +46,12 @@ export default {
     width: 50px;
     height: 5px;
     margin: 15px 5px 30px;
+  }
+
+  .sub-title {
+    font-family: $logo-font-family;
+    color: $oc-grape-0;
+    font-size: 50px;
   }
 }
 </style>

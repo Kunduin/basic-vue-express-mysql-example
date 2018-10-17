@@ -11,11 +11,9 @@ router.route("/login").post((req, res) => {
   model[USER_INFO].findOne({
     where: { username }
   }).then(info => {
-    if (info) {
-      if (password === info.password) {
-        const token = jwt.sign({ id: info.id }, SECRET_KEY);
-        res.send({ token });
-      }
+    if (info && password === info.password) {
+      const token = `Bearer ${jwt.sign({ id: info.id }, SECRET_KEY)}`;
+      res.send({ token, user: info });
     } else {
       res.status(418).send({ message: "用户名不存在" });
     }

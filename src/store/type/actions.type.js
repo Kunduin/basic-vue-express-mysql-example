@@ -1,3 +1,4 @@
 export const LOGIN = "login";
 export const REGISTER = "register";
 export const FETCH_PROFILE = "fetchProfile";
+export const LOGOUT = "logout";

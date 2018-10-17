@@ -1,6 +1,6 @@
-import { fetchUserTags } from "@/api/user";
+import { fetchUserAuthProfile } from "@/api/user";
 import { FETCH_PROFILE } from "@/store/type/actions.type";
-import { SET_TAGS } from "@/store/type/mutations.type";
+import { SET_PROFILE } from "@/store/type/mutations.type";
 
 const state = {
   profile: {
@@ -12,14 +12,16 @@ const state = {
 
 const actions = {
   async [FETCH_PROFILE](context) {
-    const { tags } = await fetchUserTags();
-    context.commit(SET_TAGS, tags);
+    if (context.state.profile) {
+      const newProfile = await fetchUserAuthProfile(context.state.profile.id);
+      context.commit(SET_PROFILE, newProfile);
+    }
   }
 };
 
 const mutations = {
-  [SET_TAGS](state, tags) {
-    state.tags = tags;
+  [SET_PROFILE](state, profile) {
+    state.profile = profile;
   }
 };
 

@@ -4,7 +4,8 @@ import {
   SET_AUTH,
   SET_LOGIN_ERROR,
   REMOVE_AUTH,
-  SET_REGSITER_ERROR
+  SET_REGSITER_ERROR,
+  SET_PROFILE
 } from "@/store/type/mutations.type";
 import { getToken, destroyToken, saveToken } from "@/util/token";
 
@@ -17,8 +18,10 @@ const state = {
 const actions = {
   async [LOGIN](context, credentials) {
     try {
-      const { token } = await login(credentials);
-      context.commit(SET_AUTH, token);
+      const { token, user } = await login(credentials);
+      context.commit(SET_PROFILE, user);
+      context.commit(SET_AUTH, { token, profile: user });
+      context.commit(SET_LOGIN_ERROR, false);
     } catch (e) {
       context.commit(SET_LOGIN_ERROR, true);
     }
@@ -42,9 +45,9 @@ const mutations = {
   [SET_REGSITER_ERROR](state, error) {
     state.isRegisterError = error;
   },
-  [SET_AUTH](state, user) {
+  [SET_AUTH](state, { token, profile }) {
     state.isAuthenticated = true;
-    saveToken(user.token);
+    saveToken(token, profile);
   },
   [REMOVE_AUTH](state) {
     state.isAuthenticated = false;

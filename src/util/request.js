@@ -1,7 +1,8 @@
 // ant-design-pro request.js file with MIT license
 import "whatwg-fetch";
 import { getToken } from "@/util/token";
-// import router from "@/router";
+import router from "@/router";
+import { LOGIN_ROUTER } from "@/router/name";
 
 const codeMessage = {
   200: "服务器成功返回请求的数据。",
@@ -73,13 +74,16 @@ export default async function request(url, options) {
   try {
     checkStatus(response);
   } catch (e) {
-    // if (e.name === 403) {
-    // }
-    throw e;
+    if (e.name === 401) {
+      router.push({ name: LOGIN_ROUTER });
+    } else {
+      throw e;
+    }
   }
 
   if (newOptions.method === "DELETE" || response.status === 204) {
     return response.text();
   }
-  return response.json();
+
+  return { ...(await response.json()), _headers: response.headers };
 }
