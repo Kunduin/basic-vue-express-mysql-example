@@ -40,7 +40,7 @@
 <script>
 import { mapState } from "vuex";
 import { REGISTER } from "@/store/type/actions.type";
-import { SET_REGSITER_ERROR } from "@/store/type/mutations.type";
+import { SET_REGISTER_ERROR } from "@/store/type/mutations.type";
 import { LOGIN_ROUTER } from "@/router/name";
 export default {
   name: "UserRegister",
@@ -63,7 +63,7 @@ export default {
   watch: {
     credentials: {
       handler() {
-        this.$store.commit(SET_REGSITER_ERROR, false);
+        this.$store.commit(SET_REGISTER_ERROR, false);
       },
       deep: true
     }
@@ -72,12 +72,12 @@ export default {
     async onSubmit() {
       const { password, passwordAgain } = this.credentials;
       if (password !== passwordAgain) {
-        this.$store.commit(SET_REGSITER_ERROR, true);
+        this.$store.commit(SET_REGISTER_ERROR, true);
         this.errorMessage = "password must be the same";
       } else {
         await this.$store.dispatch(REGISTER, this.credentials);
         if (this.errors) {
-          this.$store.commit(SET_REGSITER_ERROR, true);
+          this.$store.commit(SET_REGISTER_ERROR, true);
           this.errorMessage = "username already exist";
         } else {
           this.$router.push({ name: LOGIN_ROUTER });

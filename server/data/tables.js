@@ -1,5 +1,7 @@
-const USER_INFO = "user_info";
+const USER_INFO = "user";
+const PHOTO = "photo";
 
 module.exports = {
-  USER_INFO
+  USER_INFO,
+  PHOTO
 };

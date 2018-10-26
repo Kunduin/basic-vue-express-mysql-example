@@ -8,6 +8,11 @@ const sequelize = new Sequelize("BAY_WEB_NODE_1", "root", "se", {
   host: "101.201.65.211",
   dialect: "mysql",
   operatorsAliases: false,
+  define: {
+    charset: "utf8",
+    collate: "utf8_general_ci",
+    timestamps: true
+  },
   pool: {
     max: 5,
     min: 0,

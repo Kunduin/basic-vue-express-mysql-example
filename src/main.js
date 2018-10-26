@@ -3,6 +3,7 @@ import App from "./App.vue";
 import router from "@/router";
 import store from "@/store";
 import "normalize.css";
+import "@/style/cropperjs.css";
 import "./style/main.scss";
 import { getToken, getUserProfile } from "@/util/token";
 import { LOGIN_ROUTER } from "@/router/name";

@@ -6,7 +6,15 @@ module.exports = {
         target: "http://localhost:4000/",
         ws: true,
         changeOrigin: true
+      },
+      "/public": {
+        target: "http://localhost:4000/",
+        ws: true,
+        changeOrigin: true
       }
     }
+  },
+  configureWebpack: {
+    devtool: "#eval-source-map"
   }
 };

@@ -4,7 +4,7 @@ import {
   SET_AUTH,
   SET_LOGIN_ERROR,
   REMOVE_AUTH,
-  SET_REGSITER_ERROR,
+  SET_REGISTER_ERROR,
   SET_PROFILE
 } from "@/store/type/mutations.type";
 import { getToken, destroyToken, saveToken } from "@/util/token";
@@ -33,7 +33,7 @@ const actions = {
     try {
       await register(credentials);
     } catch (e) {
-      context.commit(SET_REGSITER_ERROR, true);
+      context.commit(SET_REGISTER_ERROR, true);
     }
   }
 };
@@ -42,7 +42,7 @@ const mutations = {
   [SET_LOGIN_ERROR](state, error) {
     state.isLoginError = error;
   },
-  [SET_REGSITER_ERROR](state, error) {
+  [SET_REGISTER_ERROR](state, error) {
     state.isRegisterError = error;
   },
   [SET_AUTH](state, { token, profile }) {

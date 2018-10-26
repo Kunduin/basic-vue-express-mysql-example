@@ -85,5 +85,5 @@ export default async function request(url, options) {
     return response.text();
   }
 
-  return { ...(await response.json()), _headers: response.headers };
+  return response.json();
 }

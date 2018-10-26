@@ -1,6 +1,11 @@
 import Vue from "vue";
 import Router from "vue-router";
-import { LOGIN_ROUTER, REGISTER_ROUTER, HOME_ROUTER } from "@/router/name";
+import {
+  LOGIN_ROUTER,
+  REGISTER_ROUTER,
+  HOME_ROUTER,
+  MIXER_ROUTER
+} from "@/router/name";
 
 Vue.use(Router);
 
@@ -29,6 +34,12 @@ export default new Router({
       name: HOME_ROUTER,
       path: "/",
       component: () => import("@/views/Home"),
+      meta: { requiresAuth: true }
+    },
+    {
+      name: MIXER_ROUTER,
+      path: "/mixer",
+      component: () => import("@/views/Mixer"),
       meta: { requiresAuth: true }
     }
   ]
