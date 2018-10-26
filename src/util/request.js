@@ -74,11 +74,7 @@ export default async function request(url, options) {
   try {
     checkStatus(response);
   } catch (e) {
-    if (e.name === 401) {
-      router.push({ name: LOGIN_ROUTER });
-    } else {
-      throw e;
-    }
+    router.push({ name: LOGIN_ROUTER });
   }
 
   if (newOptions.method === "DELETE" || response.status === 204) {

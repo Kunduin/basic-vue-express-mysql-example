@@ -147,7 +147,6 @@ header {
   opacity: 0.5;
 }
 
-
 .back-to-home {
   position: absolute;
   background-color: #ffffff;

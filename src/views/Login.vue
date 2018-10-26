@@ -35,7 +35,7 @@
 <script>
 import { mapState } from "vuex";
 import { HOME_ROUTER } from "@/router/name";
-import { LOGIN } from "@/store/type/actions.type";
+import { LOGIN, LOGOUT } from "@/store/type/actions.type";
 import { SET_LOGIN_ERROR } from "@/store/type/mutations.type";
 
 export default {
@@ -61,6 +61,9 @@ export default {
       },
       deep: true
     }
+  },
+  mounted: async function() {
+    await this.$store.dispatch(LOGOUT);
   },
   methods: {
     async onSubmit() {
