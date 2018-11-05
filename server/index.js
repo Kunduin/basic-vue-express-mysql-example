@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const models = require("./models");
-
+const session = require("express-session");
 const morgan = require("morgan");
 const app = express();
 const port = 4000;
@@ -9,6 +9,15 @@ const port = 4000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(morgan("combined"));
+app.use(
+  session({
+    saveUninitialized: true,
+    resave: true,
+    secret: "homework",
+    cookie: { maxAge: 30 * 60 * 1000 }
+  })
+);
+
 app.use("*", function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
