@@ -12,7 +12,8 @@ router.route("/login").post((req, res) => {
     where: { username }
   }).then(info => {
     if (info && password === info.password) {
-      const token = `Bearer ${jwt.sign({ id: info.id }, SECRET_KEY)}`;
+      const token = jwt.sign({ id: info.id }, SECRET_KEY);
+      req.session.token = token;
       res.send({ token, user: info });
     } else {
       res.status(418).send({ message: "用户名不存在" });

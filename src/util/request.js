@@ -21,6 +21,7 @@ const codeMessage = {
   503: "服务不可用，服务器暂时过载或维护。",
   504: "网关超时。"
 };
+
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -65,16 +66,15 @@ export default async function request(url, options) {
     }
   }
 
-  newOptions.headers = {
-    Authorization: getToken(),
-    ...newOptions.headers
-  };
-
   const response = await fetch(url, newOptions);
   try {
     checkStatus(response);
   } catch (e) {
-    router.push({ name: LOGIN_ROUTER });
+    if (e.name !== 418) {
+      router.push({ name: LOGIN_ROUTER });
+    } else {
+      throw new Error(e);
+    }
   }
 
   if (newOptions.method === "DELETE" || response.status === 204) {
