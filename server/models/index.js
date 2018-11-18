@@ -18,7 +18,8 @@ const sequelize = new Sequelize("BAY_WEB_NODE_1", "root", "se", {
     min: 0,
     acquire: 30000,
     idle: 10000
-  }
+  },
+  timezone: "+08:00"
 });
 
 fs.readdirSync(__dirname)

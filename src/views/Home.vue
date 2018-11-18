@@ -8,20 +8,48 @@
         <section class="site-title">Gallery</section>
         <section class="site-author">Upload images, Click image, Mix image</section>
         <section class="site-actions">
-          <upload-button
-            :is-loading="isUploading"
-            @onchange="onFilesChange"
-          />
+          <upload-button :is-loading="isUploading" @onchange="onFilesChange" />
         </section>
       </section>
     </header>
     <main class="site-content">
       <section class="masonry-section">
-        <gallery 
-          :photos="photos" 
-          @photoClick="onPhotoClicked" />
+        <gallery :photos="photos" @photoClick="onPhotoClicked" />
       </section>
     </main>
+    <modal :show="showModal" @close="onClose()">
+      <div class="modal-top-section">
+        <div class="modal-title-section">
+          <div class="modal-title">Shared by {{ modalUser.username }}</div>
+          <div class="modal-title subtitle">ON {{ modalDay }} with {{ modalImg.pageview }} views</div>
+        </div>
+        <div class="modal-button-section">
+          <div class="modal-button" @click="onGoMix">
+            GO MIX
+          </div>
+        </div>
+      </div>
+      <img :src="modalImg.url" style="width: 100%" alt="">
+      <div class="tag-section">
+        <div v-for="item in modalTags" :key="item.id" class="tag-item">
+          {{ item.name }}
+        </div>
+        <form
+          class="form"
+          @submit.prevent="onAddTag">
+          <input
+            v-model="nextTag"
+            class="tag-item input-text"
+            required
+            placeholder="add tag here" >
+          <input
+            class="tag-item action-section"
+            type="submit"
+            value="ADD TAG" >
+        </form>
+      </div>
+    </modal>
+
   </section>
 
 </template>
@@ -30,21 +58,40 @@
 import { mapState } from "vuex";
 import UploadButton from "@/components/Upload/index";
 import Gallery from "@/components/Gallery/index";
+import Modal from "@/components/Modal/index";
 import { FETCH_PHOTOS, POST_PHOTOS } from "@/store/type/actions.type";
 import { MIXER_ROUTER } from "@/router/name";
+import dayjs from "dayjs";
+import { addTag, getTags } from "@/api/tag";
+import { addPageview } from "@/api/photo";
+
 export default {
   name: "Home",
-  components: { Gallery, UploadButton },
+  components: { Gallery, UploadButton, Modal },
   data() {
     return {
-      isUploading: false
+      isUploading: false,
+      showModal: false,
+      modalImg: {},
+      nextTag: ""
     };
   },
   computed: {
     ...mapState({
       profile: state => state.user.profile,
       photos: state => state.user.photos
-    })
+    }),
+    modalUser: function() {
+      return this.modalImg.user || {};
+    },
+    modalTags: function() {
+      return this.modalImg.tags || [];
+    },
+    modalDay: function() {
+      return this.modalImg.createdAt
+        ? dayjs(this.modalImg.createdAt).toString()
+        : "";
+    }
   },
   async mounted() {
     await this.$store.dispatch(FETCH_PHOTOS);
@@ -64,7 +111,25 @@ export default {
       });
     },
     onPhotoClicked(photo) {
-      this.$router.push({ name: MIXER_ROUTER, params: { photo } });
+      const { id } = this.$store.state.user.profile;
+      addPageview(id, photo.id).then(photo => {
+        this.showModal = true;
+        this.modalImg = photo;
+      });
+    },
+    onClose() {
+      this.showModal = false;
+    },
+    onGoMix() {
+      this.$router.push({
+        name: MIXER_ROUTER,
+        params: { photo: this.modalImg }
+      });
+    },
+    async onAddTag() {
+      await addTag(this.modalImg.id, this.nextTag);
+      this.modalImg.tags = await getTags({ photoId: this.modalImg.id });
+      this.nextTag = "";
     }
   }
 };
@@ -162,6 +227,73 @@ header {
     height: 100%;
     text-decoration: none;
     color: gray;
+  }
+}
+
+.modal-title {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 20px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: gray;
+  padding-bottom: 20px;
+}
+
+.modal-top-section {
+  display: flex;
+}
+
+.modal-title-section {
+  flex: 1;
+}
+
+.modal-button-section {
+  padding: 0 30px 20px;
+
+  .modal-button {
+    cursor: pointer;
+    padding: 10px 20px;
+    background: #4c6ef5;
+    color: white;
+    font-family: "IBM Plex Sans", sans-serif;
+    border-radius: 3px;
+  }
+}
+
+.tag-section {
+  padding: 10px 20px 0;
+
+  .tag-item {
+    display: inline-block;
+    padding: 5px 12px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background: #dddddd;
+    font-family: "IBM Plex Sans", sans-serif;
+    border-radius: 3px;
+  }
+
+  .form {
+    padding: 0;
+    display: inline-block;
+
+    input {
+      border: none;
+      outline: none;
+    }
+
+    .input-text {
+      background: #dddddd;
+    }
+    .action-section {
+      background: #4c6ef5;
+      color: white;
+      cursor: pointer;
+    }
   }
 }
 

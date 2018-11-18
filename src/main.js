@@ -12,6 +12,8 @@ import { SET_PROFILE } from "@/store/type/mutations.type";
 Vue.config.productionTip = false;
 
 router.beforeEach((to, from, next) => {
+  // document.body.style.overflow = "auto";
+
   if (to.meta && to.meta.requiresAuth && !getToken()) {
     next({ name: LOGIN_ROUTER });
   } else {

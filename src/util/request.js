@@ -1,6 +1,5 @@
 // ant-design-pro request.js file with MIT license
 import "whatwg-fetch";
-import { getToken } from "@/util/token";
 import router from "@/router";
 import { LOGIN_ROUTER } from "@/router/name";
 

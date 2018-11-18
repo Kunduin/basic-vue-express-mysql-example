@@ -1,4 +1,6 @@
-const { PHOTO, USER_INFO } = require("../data/tables");
+const { PHOTO, USER_INFO, TAG, PHOTO_TAG } = require("../data/tables");
+const dayjs = require("dayjs");
+
 module.exports = (sequelize, DataTypes) => {
   const photo = sequelize.define(
     PHOTO,
@@ -13,6 +15,26 @@ module.exports = (sequelize, DataTypes) => {
       },
       filename: {
         type: DataTypes.STRING
+      },
+      pageview: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        get() {
+          return dayjs(this.getDataValue("createdAt"))
+            .add(8, "hour")
+            .valueOf();
+        }
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        get() {
+          return dayjs(this.getDataValue("updatedAt"))
+            .add(8, "hour")
+            .valueOf();
+        }
       }
     },
     {
@@ -23,6 +45,10 @@ module.exports = (sequelize, DataTypes) => {
 
   photo.associate = function(models) {
     models[PHOTO].belongsTo(models[USER_INFO]);
+    models[PHOTO].belongsToMany(models[TAG], {
+      as: "tags",
+      through: PHOTO_TAG
+    });
   };
 
   return photo;
