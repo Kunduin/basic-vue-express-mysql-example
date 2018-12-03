@@ -1,5 +1,7 @@
 # GALLERY
 
+**Chrome only**
+
 ## Project setup
 
 ```
@@ -20,7 +22,6 @@ npm run backend
 
 ## Project structure
 
-
 ```
 -src //前端源代码
     -api //api文件
@@ -31,10 +32,16 @@ npm run backend
     -style //样式工具
     -util //工具文件
     -views //页面
-    
+
 -server //后端源代码
     -data //常量
     -models //ORM建表模块
     -routes //路由
     -util //工具
 ```
+
+- [ ] 用户预览图片
+- [ ] 用户添加标签
+- [ ] 用户喜欢图片
+- [ ] 用户查看所有图片
+- [ ] 用户搜索图片(访问量、时间)
