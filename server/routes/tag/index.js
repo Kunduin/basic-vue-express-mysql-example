@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { TAG, PHOTO, PHOTO_TAG } = require("../../data/tables");
+const { TAG, PHOTO } = require("../../data/tables");
 const model = require("../../models");
 const verifySession = require("../../util/jwtSecret").verifySession;
 
@@ -22,7 +22,8 @@ router
           as: "photos",
           where: throughOption
         }
-      ]
+      ],
+      order: [["pageview", "DESC"]]
     }).then(tags => {
       res.send(tags);
     });

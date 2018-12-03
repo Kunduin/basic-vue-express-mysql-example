@@ -10,7 +10,8 @@
       @change="onchange">
     <div class="image-box">
       <div class="mixer__logo">
-        <img src="../../assets/cloud-upload.svg">
+        <div v-if="isLoading" class="spinner"/>
+        <img v-else src="../../assets/cloud-upload.svg">
       </div>
       <div class="mixer__description">
         UPLOAD
@@ -51,14 +52,33 @@ export default {
   methods: {
     onchange(event) {
       const { files = [] } = event.target;
-      // eslint-disable-next-line no-console
-      console.log("file", files);
       this.$emit("onchange", files);
     }
   }
 };
 </script>
 <style lang="scss" scoped>
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner:before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  border-top-color: #333;
+  animation: spinner 0.6s linear infinite;
+}
 .mixer__upload {
   flex: 1;
   overflow: hidden;
@@ -110,6 +130,7 @@ export default {
   align-items: stretch;
 
   .mixer__logo {
+    position: relative;
     background: #00c7ff;
     width: 45px;
     height: 40px;

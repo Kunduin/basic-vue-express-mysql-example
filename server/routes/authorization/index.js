@@ -4,6 +4,7 @@ const { USER_INFO } = require("../../data/tables");
 const model = require("../../models");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../../util/jwtSecret");
+const md5 = require("blueimp-md5");
 
 router.route("/login").post((req, res) => {
   const { body = {} } = req;
@@ -11,7 +12,7 @@ router.route("/login").post((req, res) => {
   model[USER_INFO].findOne({
     where: { username }
   }).then(info => {
-    if (info && password === info.password) {
+    if (info && md5(password) === info.password) {
       const token = jwt.sign({ id: info.id }, SECRET_KEY);
       req.session.token = token;
       res.send({ token, user: info });
@@ -30,7 +31,9 @@ router.route("/register").post((req, res) => {
     if (info) {
       res.status(418).send({ message: "用户名已注册" });
     } else {
-      model[USER_INFO].create({ username, password }).then(() => res.send({}));
+      model[USER_INFO].create({ username, password: md5(password) }).then(() =>
+        res.send({})
+      );
     }
   });
 });

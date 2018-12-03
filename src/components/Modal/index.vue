@@ -1,9 +1,18 @@
 <template>
-  <transition v-if="show" name="modal">
-    <div class="modal-mask" @click="$emit('close')">
+  <transition
+    v-if="show"
+    name="modal"
+  >
+    <div
+      class="modal-mask"
+      @click="$emit('close')"
+    >
       <div class="modal-wrapper">
-        <div class="modal-container" @click.stop>
-          <slot/>
+        <div
+          class="modal-container"
+          @click.stop
+        >
+          <slot />
         </div>
       </div>
     </div>
@@ -18,16 +27,6 @@ export default {
       required: true
     }
   },
-  // computed: {
-  //   showChanged: function() {
-  //     if (this.show) {
-  //       document.body.style.overflow = "hidden";
-  //     } else {
-  //       document.body.style = undefined;
-  //     }
-  //     return this.show;
-  //   }
-  // },
   watch: {
     show: function(newVal) {
       if (newVal) {
@@ -63,6 +62,7 @@ export default {
 }
 
 .modal-container {
+  position: relative;
   padding: 20px 0 8px;
   max-width: 800px;
   min-height: 300px;

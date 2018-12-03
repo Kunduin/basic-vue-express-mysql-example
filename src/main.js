@@ -8,8 +8,14 @@ import "./style/main.scss";
 import { getToken, getUserProfile } from "@/util/token";
 import { LOGIN_ROUTER } from "@/router/name";
 import { SET_PROFILE } from "@/store/type/mutations.type";
+import BaiduMap from "vue-baidu-map";
 
 Vue.config.productionTip = false;
+
+Vue.use(BaiduMap, {
+  // ak 是在百度地图开发者平台申请的密钥 详见 http://lbsyun.baidu.com/apiconsole/key */
+  ak: "8PoS5stgfRwCdnLiLsEBYRi6Tvut3qiB"
+});
 
 router.beforeEach((to, from, next) => {
   // document.body.style.overflow = "auto";

@@ -8,44 +8,139 @@
         <section class="site-title">Gallery</section>
         <section class="site-author">Upload images, Click image, Mix image</section>
         <section class="site-actions">
-          <upload-button :is-loading="isUploading" @onchange="onFilesChange" />
+          <upload-button
+            :is-loading="isUploading"
+            @onchange="onFilesChange"
+          />
         </section>
       </section>
     </header>
+    <section class="search-section">
+      <form
+        class="search-form"
+        @submit.prevent="onSearch"
+      >
+        <input
+          v-model="searchByTag"
+          class="tag-item input-text"
+          placeholder="Search by tag"
+        >
+        <input
+          class="tag-item action-section"
+          type="submit"
+          value="search"
+        >
+      </form>
+      <div
+        class="all-tags"
+        @click="openTags"
+      >All Tags</div>
+      <section class="order-section">
+        <div
+          :class="{'is-selected':orderType==='POPULAR'}"
+          class="select-item"
+          @click="$store.dispatch('orderBy','POPULAR')"
+        >Popular</div>
+        <div
+          :class="{'is-selected':orderType==='LATEST'}"
+          class="select-item"
+          @click="$store.dispatch('orderBy','LATEST')"
+        >Latest</div>
+      </section>
+      <div
+        class="all-tags"
+        @click="openMap"
+      >SEE MAP</div>
+    </section>
     <main class="site-content">
       <section class="masonry-section">
-        <gallery :photos="photos" @photoClick="onPhotoClicked" />
+        <gallery
+          :photos="photos"
+          @photoClick="onPhotoClicked"
+        />
       </section>
     </main>
-    <modal :show="showModal" @close="onClose()">
+    <modal
+      :show="showTags"
+      @close="onTagsClose()"
+    >
+      <div class="modal-title-section">
+        <div class="modal-title">Tags</div>
+      </div>
+      <div class="modal-tag-section">
+        <div
+          v-for="tag in tags"
+          :key="tag.id"
+          class="tag-section-item"
+          @click="onClickTag(tag)"
+        >
+          <div class="name">
+            {{ tag.name }}
+          </div>
+          <div class="view">
+            hot:{{ tag.pageview }}
+          </div>
+        </div>
+      </div>
+    </modal>
+    <modal
+      :show="showMap"
+      @close="onMapClose()"
+    >
+      <baidu-map
+        :center="center"
+        :zoom="zoom"
+        style="width:800px;height:800px;margin:-20px 0 -8px"
+        ak="8PoS5stgfRwCdnLiLsEBYRi6Tvut3qiB"
+        @ready="handler"
+      />
+    </modal>
+    <modal
+      :show="showModal"
+      @close="onClose()"
+    >
       <div class="modal-top-section">
         <div class="modal-title-section">
           <div class="modal-title">Shared by {{ modalUser.username }}</div>
           <div class="modal-title subtitle">ON {{ modalDay }} with {{ modalImg.pageview }} views</div>
         </div>
         <div class="modal-button-section">
-          <div class="modal-button" @click="onGoMix">
+          <div
+            class="modal-button"
+            @click="onGoMix"
+          >
             GO MIX
           </div>
         </div>
       </div>
-      <img :src="modalImg.url" style="width: 100%" alt="">
+      <img
+        :src="modalImg.url"
+        style="width: 100%"
+        alt=""
+      >
       <div class="tag-section">
-        <div v-for="item in modalTags" :key="item.id" class="tag-item">
+        <div
+          v-for="item in modalTags"
+          :key="item.id"
+          class="tag-item"
+        >
           {{ item.name }}
         </div>
         <form
           class="form"
-          @submit.prevent="onAddTag">
+          @submit.prevent="onAddTag"
+        >
           <input
             v-model="nextTag"
             class="tag-item input-text"
             required
-            placeholder="add tag here" >
+            placeholder="add tag here"
+          >
           <input
             class="tag-item action-section"
             type="submit"
-            value="ADD TAG" >
+            value="ADD TAG"
+          >
         </form>
       </div>
     </modal>
@@ -72,14 +167,21 @@ export default {
     return {
       isUploading: false,
       showModal: false,
+      showTags: false,
+      showMap: false,
       modalImg: {},
-      nextTag: ""
+      nextTag: "",
+      searchByTag: "",
+      tags: [],
+      center: { lng: 0, lat: 0 },
+      zoom: 3
     };
   },
   computed: {
     ...mapState({
       profile: state => state.user.profile,
-      photos: state => state.user.photos
+      photos: state => state.user.photos,
+      orderType: state => state.user.orderType
     }),
     modalUser: function() {
       return this.modalImg.user || {};
@@ -98,9 +200,28 @@ export default {
   },
   methods: {
     onSubmit() {},
+    handler() {
+      this.center.lng = 116.404;
+      this.center.lat = 39.915;
+      this.zoom = 15;
+    },
+    openMap() {
+      this.showMap = true;
+    },
+    async openTags() {
+      this.tags = await getTags({});
+      this.showTags = true;
+    },
+    onSearch() {
+      this.$store.dispatch(FETCH_PHOTOS, this.searchByTag);
+    },
+    onClickTag(tag) {
+      this.searchByTag = tag.name;
+      this.showTags = false;
+      this.$store.dispatch(FETCH_PHOTOS, this.searchByTag);
+    },
+
     async onFilesChange(files) {
-      // eslint-disable-next-line no-console
-      console.log(files);
       this.isUploading = true;
       await this.$store.dispatch(POST_PHOTOS, {
         files,
@@ -120,6 +241,12 @@ export default {
     onClose() {
       this.showModal = false;
     },
+    onTagsClose() {
+      this.showTags = false;
+    },
+    onMapClose() {
+      this.showMap = false;
+    },
     onGoMix() {
       this.$router.push({
         name: MIXER_ROUTER,
@@ -136,6 +263,100 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.modal-tag-section {
+  width: 400px;
+  padding: 10px 20px 20px;
+
+  .tag-section-item {
+    background-color: #dddddd;
+    height: 40px;
+    font-family: "IBM Plex Sans", sans-serif;
+    line-height: 40px;
+    padding: 0 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: opacity 0.5s;
+
+    display: flex;
+    .name {
+      flex-grow: 1;
+    }
+
+    .view {
+      color: #4f4a8a;
+    }
+  }
+}
+
+.search-section {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: flex;
+  flex-wrap: wrap;
+
+  .simple-button {
+    height: 40px;
+    font-family: "IBM Plex Sans", sans-serif;
+    line-height: 40px;
+    padding: 0 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.5s;
+  }
+  .order-section {
+    color: white;
+    display: flex;
+    margin-right: 40px;
+    .select-item {
+      @extend .simple-button;
+      border-radius: 4px 0 0 4px;
+      background: #36335a;
+      width: 100px;
+      text-align: center;
+    }
+    .select-item:nth-child(even) {
+      border-radius: 0 4px 4px 0;
+    }
+
+    .is-selected {
+      background: #4f4a8a;
+    }
+  }
+
+  .simple-button:hover {
+    opacity: 0.8;
+  }
+
+  .all-tags {
+    @extend .simple-button;
+    background: #323554;
+    color: white;
+    margin-right: 40px;
+  }
+
+  .search-form {
+    display: flex;
+    padding-right: 40px;
+    input {
+      border: 0px;
+    }
+    .input-text {
+      padding: 5px 10px;
+      border-radius: 4px 0 0 4px;
+      height: 40px;
+    }
+
+    .action-section {
+      @extend .simple-button;
+      border-radius: 0 4px 4px 0;
+      background-color: #019fef;
+      color: white;
+    }
+  }
+}
+
 header {
   height: 70vh;
   background: url("../assets/asteroids.jpg");
@@ -143,7 +364,7 @@ header {
 
 .site-header {
   height: 100%;
-  background-image: linear-gradient(to top, #05071d 0%, #0000 100%);
+  background-image: linear-gradient(to top, #05071d 0%, rgba(0, 0, 0, 0) 100%);
 }
 
 .site-title {
@@ -263,7 +484,6 @@ header {
     border-radius: 3px;
   }
 }
-
 .tag-section {
   padding: 10px 20px 0;
 

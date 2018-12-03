@@ -8,7 +8,18 @@ const generateId = require("../../util/generateId");
 const path = require("path");
 const multer = require("multer");
 const Sequelize = require("sequelize");
+const fs = require("fs");
 const Op = Sequelize.Op;
+
+const AipImageClassifyClient = require("baidu-aip-sdk").imageClassify;
+
+// 设置APPID/AK/SK
+const APP_ID = "15014508";
+const API_KEY = "RDH7fMRXgMN8AZzUyZbIZ91h";
+const SECRET_KEY = "hDGqHtUDdVq2iw6qnS3dCkVdyjswU8Vk";
+
+// 新建一个对象，建议只保存一个对象调用服务接口
+const client = new AipImageClassifyClient(APP_ID, API_KEY, SECRET_KEY);
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -36,29 +47,19 @@ router
     let option = { name: tag };
     if (tag === "-1") {
       delete option.name;
-    } else {
-      // model[TAG].findOne({
-      //   where: {
-      //     name: photoId
-      //   },
-      //   include: [
-      //     {
-      //       model: model[TAG],
-      //       as: "tags"
-      //     },
-      //     {
-      //       model: model[USER_INFO]
-      //     }
-      //   ]
-      // }).then(photo => {
-      //   photo
-      //     .update({
-      //       pageview: photo.pageview + 1
-      //     })
-      //     .then(photo => {
-      //       res.send(photo);
-      //     });
-      // });
+    }
+
+    let orderList = [];
+    switch (sort) {
+      case "LATEST":
+        orderList = [["createdAt", "DESC"]];
+        break;
+      case "POPULAR":
+        orderList = [["pageview", "DESC"]];
+        break;
+      default:
+        orderList = [["createdAt", "DESC"]];
+        break;
     }
 
     model[PHOTO].findAll({
@@ -66,14 +67,14 @@ router
         {
           model: model[TAG],
           as: "tags",
-          through: {
-            where: option
-          }
+          where: option,
+          required: option.name ? true : false
         },
         {
           model: model[USER_INFO]
         }
-      ]
+      ],
+      order: orderList
     }).then(info => {
       if (info) {
         res.send(info);
@@ -85,14 +86,47 @@ router
   .post(verifySession, upload.array("photos"), (req, res) => {
     const { query = {}, files = [] } = req;
     const { userId } = query;
-    const nextPhotos = files.map(file => {
-      return {
-        url: DEVELOPMENT + "/public/images/" + file.filename,
-        filename: file.originalname,
-        userId
-      };
+
+    const promiseQuery = files.map(item => {
+      var fileBase64 = fs
+        .readFileSync(
+          path.resolve(__dirname, "../../static/images/" + item.filename)
+        )
+        .toString("base64");
+
+      return client.advancedGeneral(fileBase64);
     });
-    model[PHOTO].bulkCreate(nextPhotos).then(() => res.send({}));
+
+    const nextPhotos = [];
+    Promise.all(promiseQuery)
+      .then(results => {
+        for (let i = 0; i < files.length; i++) {
+          nextPhotos.push({
+            url: DEVELOPMENT + "/public/images/" + files[i].filename,
+            filename: files[i].originalname,
+            userId,
+            tags: results[i].result.map(item => ({ name: item.keyword }))
+          });
+        }
+      })
+      .then(() => {
+        const photoQuery = nextPhotos.map(item => {
+          return new Promise(resolve => {
+            model[PHOTO].create(item, {
+              include: [
+                {
+                  model: model[TAG],
+                  as: "tags"
+                }
+              ]
+            }).then(() => resolve());
+          });
+        });
+
+        Promise.all(photoQuery)
+          .then(() => res.send({}))
+          .catch(error => console.log(error));
+      });
   });
 
 router

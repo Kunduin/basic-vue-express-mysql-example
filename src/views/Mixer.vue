@@ -231,7 +231,7 @@ header {
 
 .site-header {
   height: 100%;
-  background-image: linear-gradient(to top, #05071d 0%, #0000 100%);
+  background-image: linear-gradient(to top, #05071d 0%, rgba(0, 0, 0, 0) 100%);
 }
 
 .site-title {
