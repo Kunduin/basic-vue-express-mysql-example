@@ -1,5 +1,16 @@
 # GALLERY
 
+
+## WEB 重构
+
+- [x] 登陆注册md5加密
+
+## WEB bonus
+
+1. 图片合成使用ml5，机器学习方式合成图片 **BASED ON** [fast-style-transfer-deeplearnjs](https://github.com/reiinakano/fast-style-transfer-deeplearnjs)
+2. 图片自动识别并添加标签，调用百度ai开放api端口
+
+
 ## Project setup
 
 ```
